@@ -1,0 +1,27 @@
+{
+  "name": "sinew",
+  "version": "0.0.1",
+  "description": "A simple module for enforcing the new keyword and privatizing object methods using the revelation pattern",
+  "main": "index.js",
+  "scripts": {
+    "test": "cd tests && mocha --reporter spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/brekk/sinew.git"
+  },
+  "keywords": [
+    "new",
+    "private",
+    "public",
+    "revelation",
+    "reveal"
+  ],
+  "author": "Brekk Bockrath",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "gitHead": "1cf9e50a9f2acfb4ed1a9b1b09d2c5769b13bc83",
+  "devDependencies": {
+    "should": "~3.0.1"
+  }
+}
