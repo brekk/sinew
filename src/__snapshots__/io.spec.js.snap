@@ -1,15 +1,9 @@
-{
-  "name": "sinew",
-  "version": "0.0.0",
-  "description": "",
-  "main": "sinew.js",
-  "module": "sinew.es.js",
-  "repository": "https://github.com/brekk/sinew",
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`readFile 1`] = `
+Object {
   "author": "brekk",
-  "license": "MIT",
-  "private": false,
-  "keywords": [],
-  "dependencies": {
+  "dependencies": Object {
     "cliui": "^5.0.0",
     "debug": "^4.1.1",
     "execa": "^1.0.0",
@@ -18,9 +12,10 @@
     "kleur": "^3.0.3",
     "ramda": "^0.26.1",
     "strip-ansi": "^5.2.0",
-    "yargs-parser": "^13.1.0"
+    "yargs-parser": "^13.1.0",
   },
-  "devDependencies": {
+  "description": "",
+  "devDependencies": Object {
     "@babel/cli": "^7.4.4",
     "@babel/core": "^7.4.5",
     "@babel/plugin-transform-destructuring": "^7.4.4",
@@ -53,6 +48,15 @@
     "rollup-plugin-node-resolve": "^5.0.1",
     "rollup-plugin-progress": "^1.1.1",
     "supports-color": "^6.1.0",
-    "xtrace": "^0.3.0"
-  }
+    "xtrace": "^0.3.0",
+  },
+  "keywords": Array [],
+  "license": "MIT",
+  "main": "sinew.js",
+  "module": "sinew.es.js",
+  "name": "sinew",
+  "private": false,
+  "repository": "https://github.com/brekk/sinew",
+  "version": "0.0.0",
 }
+`;
