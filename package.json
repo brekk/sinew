@@ -53,6 +53,7 @@
     "rollup-plugin-node-resolve": "^5.0.1",
     "rollup-plugin-progress": "^1.1.1",
     "supports-color": "^6.1.0",
+    "tempy": "^0.3.0",
     "xtrace": "^0.3.0"
   }
 }

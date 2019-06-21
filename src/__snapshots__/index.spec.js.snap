@@ -1,5 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`/Users/brekkbockrath/work/sinew/yamfist.js --file --to json package.yml 1`] = `undefined`;
-
-exports[`/Users/brekkbockrath/work/sinew/yamfist.js --file --to yaml package.json 1`] = `undefined`;

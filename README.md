@@ -18,47 +18,39 @@
 
 ##### Table of Contents
 
--   [processAsync](#processasync)
+-   [helpWithOptions](#helpwithoptions)
     -   [Parameters](#parameters)
-    -   [Examples](#examples)
 -   [readRaw](#readraw)
     -   [Parameters](#parameters-1)
-    -   [Examples](#examples-1)
+    -   [Examples](#examples)
 -   [readUTF8](#readutf8)
     -   [Parameters](#parameters-2)
-    -   [Examples](#examples-2)
+    -   [Examples](#examples-1)
 -   [readFile](#readfile)
     -   [Parameters](#parameters-3)
+    -   [Examples](#examples-2)
+-   [writeRaw](#writeraw)
+    -   [Parameters](#parameters-4)
     -   [Examples](#examples-3)
+-   [writeRaw](#writeraw-1)
+    -   [Parameters](#parameters-5)
+    -   [Examples](#examples-4)
+-   [writeFile](#writefile)
+    -   [Parameters](#parameters-6)
+    -   [Examples](#examples-5)
+-   [testCLI](#testcli)
+    -   [Parameters](#parameters-7)
 
-#### processAsync
+#### helpWithOptions
+
+Convert a yargs-parser object and a config into a help string
 
 ##### Parameters
 
--   `fn` **[function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** a future-processing function
--   `opts` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** an object of opts
-    -   `opts.file` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** read from a file?
-    -   `opts.output` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the name of a file to write to
--   `source` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** an instruction to parse
+-   `conf` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** a configuration object
+-   `argv` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** a yargs-parser parsed argv
 
-##### Examples
-
-```javascript
-import {processAsync} from "sinew"
-import {pipe, map} from "ramda"
-// ...
-export const json2yaml = processAsync(
-  curry((opts, source) =>
-    pipe(
-      trace("j2y"),
-      chain(parseJSON),
-      map(toYAML(opts))
-    )(source)
-  )
- )
-```
-
-Returns **Future** a future value of an executable process
+Returns **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** formatted string
 
 #### readRaw
 
@@ -94,7 +86,7 @@ fs.readFile but curried and with utf8 format chosen
 
 ##### Parameters
 
--   `path-to-a-file` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `path` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** path-to-a-file
 -   `callback` **[function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** a node-style nodeback function
 
 ##### Examples
@@ -117,11 +109,11 @@ Returns **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/G
 
 #### readFile
 
-fs.readFile but returning a Future
+fs.readFile but utf8 and returning a Future
 
 ##### Parameters
 
--   `path-to-a-file` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `path` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** path-to-a-file
 
 ##### Examples
 
@@ -136,3 +128,80 @@ export readFileAndDoStuff = pipe(
 ```
 
 Returns **Future&lt;[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** a future value of a string
+
+#### writeRaw
+
+fs.readFile but curried; arity 4
+
+##### Parameters
+
+-   `path` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** path-to-a-file
+-   `data` **any** data to write to a path
+-   `format` **([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object))** format or opts
+-   `callback` **[function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** a nodeback-style callback function
+
+##### Examples
+
+```javascript
+import {writeRaw} from "sinew"
+writeRaw("my-file.md", "cool", "utf8", (e) => {
+  if(e) console.warn(e)
+  // done
+})
+```
+
+#### writeRaw
+
+fs.readFile but curried; format utf8
+
+##### Parameters
+
+-   `path` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** path-to-a-file
+-   `data` **any** data to write to a path
+-   `callback` **[function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** a nodeback-style callback function
+
+##### Examples
+
+```javascript
+import { writeUTF8 } from "sinew"
+
+writeUTF8('my-file.md', 'cool', (e) => {
+  if(e) console.warn(e)
+  // done
+})
+```
+
+#### writeFile
+
+Write a utf8 file and wrap the action in a future
+
+##### Parameters
+
+-   `to` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** path-to-a-file
+-   `data` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** data to write
+
+##### Examples
+
+```javascript
+import { writeFile, readFile } from "sinew"
+import { curry, pipe, map, chain } from "ramda"
+
+const prepend = curry((pre, file, data) => pipe(
+  readFile(file),
+  map(raw => pre = raw),
+  chain(writeFile)
+))
+```
+
+Returns **Future&lt;[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** a future-wrapped value(?)
+
+#### testCLI
+
+A simplified way of testing asynchronous command-line calls
+Designed for jest testing
+
+##### Parameters
+
+-   `cli` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** commands and flags to pass to execa
+-   `testName` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the name of your test
+-   `assertion` **[function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** an assertion function. receives actual value as only param

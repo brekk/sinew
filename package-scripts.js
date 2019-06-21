@@ -35,7 +35,7 @@ module.exports = {
       `check dependencies`
     ),
     readme: sd(
-      `documentation readme -s "API" src/**.js`,
+      `documentation readme -s "API" src/**.js --access public`,
       `regenerate the readme`
     ),
     lint: {

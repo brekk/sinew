@@ -1,5 +1,5 @@
 import F, { node } from 'fluture';
-import { curryN, __, pipe as pipe$1, curry as curry$1, chain, identity, propOr, find, equals, map, join, path as path$2, toPairs, reduce, pathOr, prop as prop$1 } from 'ramda';
+import { curryN, __, pipe as pipe$1, curry as curry$1, chain, identity, propOr, find, equals, map, join, pathOr, path as path$2, toPairs, reduce, prop as prop$1 } from 'ramda';
 import getStdin from 'get-stdin';
 import path$1 from 'path';
 import fs from 'fs';
@@ -650,8 +650,7 @@ var readFile = pipe$1(readUTF8, node);
 var writeRaw = curryN(4, gracefulFs.writeFile);
 var writeUTF8 = writeRaw(__, __, "utf8");
 var writeFile = curry$1(function (to, data) {
-  return pipe$1(writeUTF8(to),
-  node)(data);
+  return pipe$1(writeUTF8(to), node)(data);
 });
 
 var _io = /*#__PURE__*/Object.freeze({
@@ -666,13 +665,31 @@ var _io = /*#__PURE__*/Object.freeze({
 var readRelative = pipe$1(relativePathWithCWD(process.cwd()), readFile);
 var readStdin = F.encaseP(getStdin);
 var readWithOpts = curry$1(function (opts, source) {
-  return opts.stdin ? readStdin() : F.of(source);
+  return (
+    opts.stdin ?
+    readStdin()
+    : F.of(source)
+  );
 });
+var ensureBinary = function ensureBinary(fn) {
+  if (process.env.NODE_ENV !== "production") {
+    if (typeof fn !== "function" || typeof fn("test") !== "function") {
+      throw new TypeError("Expected to be given a curried binary function!");
+    }
+  }
+  return fn;
+};
 var processAsync = curry$1(function (fn, opts, source) {
-  return pipe$1(opts.file ? readRelative : readWithOpts(opts), fn(opts), opts.output ? chain(writeFile(opts.output)) : identity)(source);
+  return pipe$1(
+  opts.file ? readRelative : readWithOpts(opts),
+  ensureBinary(fn)(opts),
+  opts.output ? chain(writeFile(opts.output)) : identity)(source);
 });
 
 var _cli = /*#__PURE__*/Object.freeze({
+	readRelative: readRelative,
+	readStdin: readStdin,
+	readWithOpts: readWithOpts,
 	processAsync: processAsync
 });
 
@@ -694,11 +711,41 @@ var matchesTypeFromConfig = curry$1(function (config, type, x) {
 var flag = function flag(z) {
   return (stripAnsi(z).length === 1 ? "-" : "--") + z;
 };
-var flagify = curry$1(function (c, x) {
-  return pipe$1(map(pipe$1(yellow(c), flag)), join(", "))(x);
+var flagify = curry$1(function (useColors, flags) {
+  return pipe$1(map(pipe$1(yellow(useColors), flag)), join(", "))(flags);
 });
 var wrapChars = curry$1(function (a, b) {
   return a[0] + b + a[1];
+});
+var TYPES = ["string", "boolean", "array", "number"];
+var getRawDescriptionsOrThrow = curry$1(function (w, x) {
+  return pipe$1(pathOr("TBD", ["raw", "descriptions", x.name]), function (d) {
+    if (d === "TBD") {
+      throw new Error("".concat(x.name, " needs a description!"));
+    }
+    return d;
+  })(w);
+});
+var getDefaults = curry$1(function (w, x) {
+  return pathOr(" ", ["raw", "yargsOpts", "default", x.name], w);
+});
+var getType = curry$1(function (w, x) {
+  var matcher = matchesTypeFromConfig(w.raw.yargsOpts);
+  var findFlag = function findFlag(t) {
+    return find(matcher(t), x.flags) ? t : false;
+  };
+  var type = TYPES.map(findFlag).find(identity);
+  return type;
+});
+var convertFlag = curry$1(function (w, x) {
+  var type = getType(w, x);
+  var description = getRawDescriptionsOrThrow(w, x);
+  var def = getDefaults(w, x);
+  return Object.assign({}, x, {
+    type: type,
+    description: description,
+    "default": def
+  });
 });
 var getFlagInformation = function getFlagInformation(conf) {
   return pipe$1(path$2(["yargsOpts", "alias"]), toPairs, map(function (_ref) {
@@ -720,55 +767,52 @@ var getFlagInformation = function getFlagInformation(conf) {
     raw: conf,
     data: []
   }), function (w) {
-    return map(function (x) {
-      var matcher = matchesTypeFromConfig(w.raw.yargsOpts);
-      var findFlag = function findFlag(t) {
-        return find(matcher(t), x.flags) ? t : false;
-      };
-      var type = ["string", "boolean", "array", "number"].map(findFlag).find(identity);
-      if (type) x.type = type;
-      var description = pathOr("TBD", ["raw", "descriptions", x.name], w);
-      if (description === "TBD") throw new Error("".concat(x.name, " needs a description!"));
-      if (description) x.description = description;
-      var def = pathOr(" ", ["raw", "yargsOpts", "default", x.name], w);
-      if (def) x["default"] = def;
-      return x;
-    }, w.data);
+    return map(convertFlag(w), w.data);
   })(conf);
 };
+var getDefaultDiv = function getDefaultDiv(def) {
+  return def !== " " ? {
+    text: "(default: ".concat(def, ")"),
+    align: "right",
+    padding: [0, 2, 0, 0]
+  } : def;
+};
 var helpWithOptions = curry$1(function (conf, argv) {
+  var useColors = argv.color;
   var ui = cliui();
   var flags = getFlagInformation(conf);
-  ui.div("\n".concat(underline(argv.color)("Usage:"), " ").concat(bold(argv.color)(conf.name), " <flags> [input]\n"));
-  ui.div("".concat(underline(argv.color)("Flags:"), "\n"));
+  ui.div("\n".concat(underline(useColors)("Usage:"), " ").concat(bold(useColors)(conf.name), " <flags> [input]\n"));
+  ui.div("".concat(underline(useColors)("Flags:"), "\n"));
   flags.forEach(function (_ref4) {
     var def = _ref4["default"],
         tags = _ref4.flags,
         description = _ref4.description,
         type = _ref4.type;
     return ui.div({
-      text: flagify(argv.color, tags),
+      text: flagify(useColors, tags),
       padding: [0, 0, 1, 1],
       align: "left"
     }, {
-      text: pipe$1(red(argv.color), wrapChars("[]"))(type),
+      text: pipe$1(red(useColors), wrapChars("[]"))(type),
       width: 15,
       padding: [0, 1, 0, 1],
       align: "center"
     }, {
       text: description,
       width: 36
-    }, def !== " " ? {
-      text: "(default: ".concat(def, ")"),
-      align: "right",
-      padding: [0, 2, 0, 0]
-    } : def);
+    }, getDefaultDiv(def));
   });
   return ui.toString();
 });
 
 var _help = /*#__PURE__*/Object.freeze({
+	matchesTypeFromConfig: matchesTypeFromConfig,
+	flag: flag,
+	flagify: flagify,
 	wrapChars: wrapChars,
+	getRawDescriptionsOrThrow: getRawDescriptionsOrThrow,
+	getDefaults: getDefaults,
+	convertFlag: convertFlag,
 	getFlagInformation: getFlagInformation,
 	helpWithOptions: helpWithOptions
 });
@@ -930,27 +974,19 @@ var is = curry$1(function (expected, actual) {
 var matches = function matches(x) {
   return expect(x).toMatchSnapshot();
 };
-var testHook = curry$1(function (property, done, fn, x) {
-  return pipe$1(prop$1(property), fn, function () {
+var testHook = curry$1(function (property, done, assertion, x) {
+  return pipe$1(prop$1(property), assertion, function () {
     return done();
   })(x);
 });
 var testHookStdout = testHook("stdout");
 var testHookStderr = testHook("stderr");
-var testCLI = curry$1(function (_ref, testName, fn) {
+var testCLI = curry$1(function (_ref, testName, assertion) {
   var _ref2 = _toArray(_ref),
       exe = _ref2[0],
       args = _ref2.slice(1);
   test(testName, function (done) {
-    return execa(exe, args)["catch"](done).then(testHookStdout(done, fn));
-  });
-});
-var testCLIError = curry$1(function (_ref3, testName, fn) {
-  var _ref4 = _toArray(_ref3),
-      exe = _ref4[0],
-      args = _ref4.slice(1);
-  test(testName, function (done) {
-    return execa(exe, args)["catch"](testHookStderr(done, fn));
+    return execa(exe, args)["catch"](done).then(testHookStdout(done, assertion));
   });
 });
 var resolveFrom = function resolveFrom(dir) {
@@ -969,7 +1005,6 @@ var _testing = /*#__PURE__*/Object.freeze({
 	testHookStdout: testHookStdout,
 	testHookStderr: testHookStderr,
 	testCLI: testCLI,
-	testCLIError: testCLIError,
 	resolveFrom: resolveFrom
 });
 
