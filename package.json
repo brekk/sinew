@@ -1,6 +1,6 @@
 {
   "name": "sinew",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "sinew.js",
   "module": "sinew.es.js",
