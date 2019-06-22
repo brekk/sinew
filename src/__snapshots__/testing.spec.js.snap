@@ -41,9 +41,8 @@ Available scripts (camel or kebab case accepted)
 [32mdocs[39m - [37mauto regen the docs[39m - [90mdocumentation build src/**.js -f html -o docs[39m
 [32mdocs.serve[39m - [37mserve the documentation[39m - [90mdocumentation serve src/**.js[39m
 [32mbundle[39m - [37mgenerate bundles[39m - [90mrollup -c rollup.config.js[39m
-[32mbuild[39m - [37mconvert files individually[39m - [90mbabel src -d lib --ignore src/*.spec.js,src/*.fixture.js[39m
-[32mcare[39m - [37mrun all the things[39m - [90mnps build && nps bundle && node node_modules/concurrently/src/main.js --kill-others-on-fail --prefix-colors \\"bgBlue.bold,bgMagenta.bold,bgGreen.bold,bgBlack.bold,bgCyan.bold\\" --prefix \\"[{name}]\\" --names \\"docs,lint,test,readme,dependencies\\" 'nps docs' 'nps lint' 'nps test' 'nps readme' 'nps dependencies'[39m
-[32mgenerate[39m - [90mnps build && nps bundle && chmod +x ./sinew.js[39m"
+[32mcare[39m - [37mrun all the things[39m - [90mnps bundle && node node_modules/concurrently/src/main.js --kill-others-on-fail --prefix-colors \\"bgBlue.bold,bgMagenta.bold,bgGreen.bold,bgBlack.bold,bgCyan.bold\\" --prefix \\"[{name}]\\" --names \\"docs,lint,test,readme,dependencies\\" 'nps docs' 'nps lint' 'nps test' 'nps readme' 'nps dependencies'[39m
+[32mgenerate[39m - [90mnps bundle[39m"
 `;
 
 exports[`testCLI 1`] = `
@@ -87,7 +86,6 @@ Available scripts (camel or kebab case accepted)
 [32mdocs[39m - [37mauto regen the docs[39m - [90mdocumentation build src/**.js -f html -o docs[39m
 [32mdocs.serve[39m - [37mserve the documentation[39m - [90mdocumentation serve src/**.js[39m
 [32mbundle[39m - [37mgenerate bundles[39m - [90mrollup -c rollup.config.js[39m
-[32mbuild[39m - [37mconvert files individually[39m - [90mbabel src -d lib --ignore src/*.spec.js,src/*.fixture.js[39m
-[32mcare[39m - [37mrun all the things[39m - [90mnps build && nps bundle && node node_modules/concurrently/src/main.js --kill-others-on-fail --prefix-colors \\"bgBlue.bold,bgMagenta.bold,bgGreen.bold,bgBlack.bold,bgCyan.bold\\" --prefix \\"[{name}]\\" --names \\"docs,lint,test,readme,dependencies\\" 'nps docs' 'nps lint' 'nps test' 'nps readme' 'nps dependencies'[39m
-[32mgenerate[39m - [90mnps build && nps bundle && chmod +x ./sinew.js[39m"
+[32mcare[39m - [37mrun all the things[39m - [90mnps bundle && node node_modules/concurrently/src/main.js --kill-others-on-fail --prefix-colors \\"bgBlue.bold,bgMagenta.bold,bgGreen.bold,bgBlack.bold,bgCyan.bold\\" --prefix \\"[{name}]\\" --names \\"docs,lint,test,readme,dependencies\\" 'nps docs' 'nps lint' 'nps test' 'nps readme' 'nps dependencies'[39m
+[32mgenerate[39m - [90mnps bundle[39m"
 `;

@@ -1,14 +1,12 @@
 'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var F = require('fluture');
 var F__default = _interopDefault(F);
 var ramda = require('ramda');
 var getStdin = _interopDefault(require('get-stdin'));
-var path$1 = _interopDefault(require('path'));
+var path = _interopDefault(require('path'));
 var fs = _interopDefault(require('fs'));
 var cliui = _interopDefault(require('cliui'));
 var color = _interopDefault(require('kleur'));
@@ -16,7 +14,7 @@ var stripAnsi = _interopDefault(require('strip-ansi'));
 var debug = _interopDefault(require('debug'));
 var execa = _interopDefault(require('execa'));
 
-var relativePathWithCWD = ramda.curryN(2, path$1.relative);
+var relativePathWithCWD = ramda.curryN(2, path.relative);
 
 var _path = /*#__PURE__*/Object.freeze({
   relativePathWithCWD: relativePathWithCWD
@@ -439,7 +437,7 @@ var resolveFrom = function resolveFrom(dir) {
     for (var _len = arguments.length, x = new Array(_len), _key = 0; _key < _len; _key++) {
       x[_key] = arguments[_key];
     }
-    return path$1.resolve.apply(path$1, [dir].concat(x));
+    return path.resolve.apply(path, [dir].concat(x));
   };
 };
 var testCommand = ramda.curry(function (args, assertion) {
@@ -458,12 +456,6 @@ var _testing = /*#__PURE__*/Object.freeze({
   testCommand: testCommand
 });
 
-var cli = _cli;
-var help = _help;
-var io = _io;
-var log = _log;
-var path = _path;
-var testing = _testing;
 var index = {
   cli: _cli,
   help: _help,
@@ -473,10 +465,4 @@ var index = {
   testing: _testing
 };
 
-exports.cli = cli;
-exports.default = index;
-exports.help = help;
-exports.io = io;
-exports.log = log;
-exports.path = path;
-exports.testing = testing;
+module.exports = index;

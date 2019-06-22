@@ -38,8 +38,14 @@
 -   [writeFile](#writefile)
     -   [Parameters](#parameters-6)
     -   [Examples](#examples-5)
--   [testCLI](#testcli)
+-   [is](#is)
     -   [Parameters](#parameters-7)
+-   [matches](#matches)
+    -   [Parameters](#parameters-8)
+-   [testCLI](#testcli)
+    -   [Parameters](#parameters-9)
+-   [testCLI](#testcli-1)
+    -   [Parameters](#parameters-10)
 
 #### helpWithOptions
 
@@ -194,6 +200,38 @@ const prepend = curry((pre, file, data) => pipe(
 ```
 
 Returns **Future&lt;[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** a future-wrapped value(?)
+
+#### is
+
+expect(actual).toEqual(expected) but curried
+
+##### Parameters
+
+-   `expected` **any** an expected value
+-   `actual` **any** the actual value
+
+Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
+
+#### matches
+
+expect(actual).toMatchSnapshot alias as a unary function
+
+##### Parameters
+
+-   `x` **any** a value
+
+Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** a boolean value
+
+#### testCLI
+
+A simplified way of testing asynchronous command-line calls using execa.shell
+Designed for jest testing
+
+##### Parameters
+
+-   `cli` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** commands and flags to pass to execa
+-   `testName` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the name of your test
+-   `assertion` **[function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** an assertion function. receives actual value as only param
 
 #### testCLI
 

@@ -20,8 +20,7 @@ exports[`processAsync - read file 1`] = `
     \\"get-stdin\\": \\"^7.0.0\\",
     \\"kleur\\": \\"^3.0.3\\",
     \\"ramda\\": \\"^0.26.1\\",
-    \\"strip-ansi\\": \\"^5.2.0\\",
-    \\"yargs-parser\\": \\"^13.1.0\\"
+    \\"strip-ansi\\": \\"^5.2.0\\"
   },
   \\"devDependencies\\": {
     \\"@babel/cli\\": \\"^7.4.4\\",
@@ -31,7 +30,6 @@ exports[`processAsync - read file 1`] = `
     \\"babel-core\\": \\"^6.26.3\\",
     \\"babel-eslint\\": \\"^10.0.1\\",
     \\"babel-jest\\": \\"^24.8.0\\",
-    \\"camel-case\\": \\"^3.0.0\\",
     \\"depcheck\\": \\"^0.6.11\\",
     \\"eslint\\": \\"^5.16.0\\",
     \\"eslint-config-prettier\\": \\"^4.3.0\\",
@@ -44,7 +42,6 @@ exports[`processAsync - read file 1`] = `
     \\"eslint-plugin-promise\\": \\"^4.1.1\\",
     \\"eslint-plugin-ramda\\": \\"^2.5.1\\",
     \\"eslint-plugin-standard\\": \\"^4.0.0\\",
-    \\"graceful-fs\\": \\"^4.1.15\\",
     \\"nps\\": \\"^5.9.5\\",
     \\"nps-utils\\": \\"^1.7.0\\",
     \\"prettier-eslint\\": \\"^8.8.2\\",
@@ -55,7 +52,6 @@ exports[`processAsync - read file 1`] = `
     \\"rollup-plugin-json\\": \\"^4.0.0\\",
     \\"rollup-plugin-node-resolve\\": \\"^5.0.1\\",
     \\"rollup-plugin-progress\\": \\"^1.1.1\\",
-    \\"supports-color\\": \\"^6.1.0\\",
     \\"tempy\\": \\"^0.3.0\\",
     \\"xtrace\\": \\"^0.3.0\\"
   }
@@ -75,7 +71,6 @@ Object {
     "kleur": "^3.0.3",
     "ramda": "^0.26.1",
     "strip-ansi": "^5.2.0",
-    "yargs-parser": "^13.1.0",
   },
   "description": "",
   "devDependencies": Object {
@@ -86,7 +81,6 @@ Object {
     "babel-core": "^6.26.3",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^24.8.0",
-    "camel-case": "^3.0.0",
     "depcheck": "^0.6.11",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.3.0",
@@ -99,7 +93,6 @@ Object {
     "eslint-plugin-promise": "^4.1.1",
     "eslint-plugin-ramda": "^2.5.1",
     "eslint-plugin-standard": "^4.0.0",
-    "graceful-fs": "^4.1.15",
     "nps": "^5.9.5",
     "nps-utils": "^1.7.0",
     "prettier-eslint": "^8.8.2",
@@ -110,7 +103,6 @@ Object {
     "rollup-plugin-json": "^4.0.0",
     "rollup-plugin-node-resolve": "^5.0.1",
     "rollup-plugin-progress": "^1.1.1",
-    "supports-color": "^6.1.0",
     "tempy": "^0.3.0",
     "xtrace": "^0.3.0",
   },

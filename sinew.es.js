@@ -1,7 +1,7 @@
 import F, { node } from 'fluture';
-import { curryN, __, pipe as pipe$1, curry as curry$1, chain, identity, propOr, find, equals, map, join, pathOr, path as path$2, toPairs, reduce, prop as prop$1 } from 'ramda';
+import { curryN, __, pipe as pipe$1, curry as curry$1, chain, identity, propOr, find, equals, map, join, pathOr, path as path$1, toPairs, reduce, prop as prop$1 } from 'ramda';
 import getStdin from 'get-stdin';
-import path$1 from 'path';
+import path from 'path';
 import fs from 'fs';
 import cliui from 'cliui';
 import color from 'kleur';
@@ -9,7 +9,7 @@ import stripAnsi from 'strip-ansi';
 import debug from 'debug';
 import execa from 'execa';
 
-var relativePathWithCWD = curryN(2, path$1.relative);
+var relativePathWithCWD = curryN(2, path.relative);
 
 var _path = /*#__PURE__*/Object.freeze({
   relativePathWithCWD: relativePathWithCWD
@@ -181,7 +181,7 @@ var convertFlag = curry$1(function (w, x) {
   });
 });
 var getFlagInformation = function getFlagInformation(conf) {
-  return pipe$1(path$2(["yargsOpts", "alias"]), toPairs, map(function (_ref) {
+  return pipe$1(path$1(["yargsOpts", "alias"]), toPairs, map(function (_ref) {
     var _ref2 = _slicedToArray(_ref, 2),
         k = _ref2[0],
         v = _ref2[1];
@@ -432,7 +432,7 @@ var resolveFrom = function resolveFrom(dir) {
     for (var _len = arguments.length, x = new Array(_len), _key = 0; _key < _len; _key++) {
       x[_key] = arguments[_key];
     }
-    return path$1.resolve.apply(path$1, [dir].concat(x));
+    return path.resolve.apply(path, [dir].concat(x));
   };
 };
 var testCommand = curry$1(function (args, assertion) {
@@ -451,12 +451,6 @@ var _testing = /*#__PURE__*/Object.freeze({
   testCommand: testCommand
 });
 
-var cli = _cli;
-var help = _help;
-var io = _io;
-var log = _log;
-var path = _path;
-var testing = _testing;
 var index = {
   cli: _cli,
   help: _help,
@@ -467,4 +461,3 @@ var index = {
 };
 
 export default index;
-export { cli, help, io, log, path, testing };

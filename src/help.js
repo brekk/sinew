@@ -46,7 +46,7 @@ export const matchesTypeFromConfig = curry((config, type, x) =>
  * @private
  * @method flag
  * @param {string} z - a string
- * @return {string}
+ * @return {string} flags
  */
 export const flag = z => (stripAnsi(z).length === 1 ? `-` : `--`) + z
 
