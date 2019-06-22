@@ -1,5 +1,51 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`nps 1`] = `
+"Usage: node_modules/.bin/nps [options] <script>...
+
+Commands:
+  init        automatically migrate from npm scripts to nps
+  completion  generate bash completion script
+
+Options:
+  --config, -c      Config file to use (defaults to nearest package-scripts.yml
+                    or package-scripts.js)
+                 [default: \\"/Users/brekkbockrath/work/sinew/package-scripts.js\\"]
+  --silent, -s      Silent nps output                 [boolean] [default: false]
+  --log-level, -l   The log level to use
+                   [choices: \\"error\\", \\"warn\\", \\"info\\", \\"debug\\"] [default: \\"info\\"]
+  --require, -r     Module to preload
+  --scripts         Log command text for script        [boolean] [default: true]
+  --help-style, -y  Choose the level of detail displayed by the help command
+                           [choices: \\"all\\", \\"scripts\\", \\"basic\\"] [default: \\"all\\"]
+  -h, --help        Show help                                          [boolean]
+  -v, --version     Show version number                                [boolean]
+
+Examples:
+  node_modules/.bin/nps test build          Runs the \`test\` script then the
+                                            \`build\` script
+  node_modules/.bin/nps \\"test --cover\\"      Runs the \`test\` script and forwards
+  \\"build --prod\\"                            the \\"--cover\\" flag then the \`build\`
+                                            script and forwards the \\"--prod\\"
+                                            flag
+
+Available scripts (camel or kebab case accepted)
+
+[32mdependencies[39m - [37mcheck dependencies[39m - [90mdepcheck --specials=bin,eslint,babel --ignores=@babel/cli,@babel/core,@babel/plugin-transform-destructuring,@babel/preset-env,babel-core,babel-eslint,babel-jest,depcheck,documentation,docusaurus,husky,jest,prettier-eslint,rollup,nps[39m
+[32mreadme[39m - [37mregenerate the readme[39m - [90mdocumentation readme -s \\"API\\" src/**.js --access public[39m
+[32mlint[39m - [37mlint both the js and the jsdoc[39m - [90mnode node_modules/concurrently/src/main.js --kill-others-on-fail --prefix-colors \\"bgBlue.bold,bgMagenta.bold\\" --prefix \\"[{name}]\\" --names \\"lint.src,lint.jsdoc\\" 'nps lint.src' 'nps lint.jsdoc'[39m
+[32mlint.src[39m - [37mlint js files[39m - [90meslint src/*.js --env jest --fix[39m
+[32mlint.jsdoc[39m - [37mlint jsdoc in files[39m - [90mdocumentation lint src/*/*.js[39m
+[32mtest[39m - [37mrun all tests with coverage[39m - [90mNODE_ENV=test jest --verbose --coverage[39m
+[32mtest.watch[39m - [90mNODE_ENV=test jest --verbose --coverage --watchAll[39m
+[32mdocs[39m - [37mauto regen the docs[39m - [90mdocumentation build src/**.js -f html -o docs[39m
+[32mdocs.serve[39m - [37mserve the documentation[39m - [90mdocumentation serve src/**.js[39m
+[32mbundle[39m - [37mgenerate bundles[39m - [90mrollup -c rollup.config.js[39m
+[32mbuild[39m - [37mconvert files individually[39m - [90mbabel src -d lib --ignore src/*.spec.js,src/*.fixture.js[39m
+[32mcare[39m - [37mrun all the things[39m - [90mnps build && nps bundle && node node_modules/concurrently/src/main.js --kill-others-on-fail --prefix-colors \\"bgBlue.bold,bgMagenta.bold,bgGreen.bold,bgBlack.bold,bgCyan.bold\\" --prefix \\"[{name}]\\" --names \\"docs,lint,test,readme,dependencies\\" 'nps docs' 'nps lint' 'nps test' 'nps readme' 'nps dependencies'[39m
+[32mgenerate[39m - [90mnps build && nps bundle && chmod +x ./sinew.js[39m"
+`;
+
 exports[`testCLI 1`] = `
 "Usage: node_modules/.bin/nps [options] <script>...
 

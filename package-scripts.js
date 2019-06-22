@@ -55,18 +55,20 @@ module.exports = {
       serve: sd(`documentation serve src/**.js`, `serve the documentation`)
     },
     bundle: sd(`rollup -c rollup.config.js`, `generate bundles`),
-    build: sd(
-      series(`babel src -d lib --ignore src/*.spec.js,src/*.fixture.js`),
-      `convert files individually`
-    ),
+    // build: sd(
+    //   series(
+    //     `babel src -d . --ignore src/*.spec.js,src/*.fixture.js,src/index.js`
+    //   ),
+    //   `convert files individually`
+    // ),
     care: sd(
       series(
-        `nps build`,
+        // `nps build`,
         `nps bundle`,
         npsAll(`docs`, `lint`, `test`, `readme`, `dependencies`)
       ),
       `run all the things`
     ),
-    generate: series(`nps build`, `nps bundle`, `chmod +x ./${name}.js`)
+    generate: `nps bundle`
   }
 }

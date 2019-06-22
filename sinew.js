@@ -10,10 +10,6 @@ var ramda = require('ramda');
 var getStdin = _interopDefault(require('get-stdin'));
 var path$1 = _interopDefault(require('path'));
 var fs = _interopDefault(require('fs'));
-var constants = _interopDefault(require('constants'));
-var stream = _interopDefault(require('stream'));
-var util = _interopDefault(require('util'));
-var assert = _interopDefault(require('assert'));
 var cliui = _interopDefault(require('cliui'));
 var color = _interopDefault(require('kleur'));
 var stripAnsi = _interopDefault(require('strip-ansi'));
@@ -23,364 +19,57 @@ var execa = _interopDefault(require('execa'));
 var relativePathWithCWD = ramda.curryN(2, path$1.relative);
 
 var _path = /*#__PURE__*/Object.freeze({
-	relativePathWithCWD: relativePathWithCWD
+  relativePathWithCWD: relativePathWithCWD
 });
 
-function createCommonjsModule(fn, module) {
-	return module = { exports: {} }, fn(module, module.exports), module.exports;
-}
+var readRaw = ramda.curryN(3, fs.readFile);
+var readUTF8 = readRaw(ramda.__, "utf8");
+var readFile = ramda.pipe(readUTF8, F.node);
+var writeRaw = ramda.curryN(4, fs.writeFile);
+var writeUTF8 = writeRaw(ramda.__, ramda.__, "utf8");
+var writeFile = ramda.curry(function (to, data) {
+  return ramda.pipe(writeUTF8(to), F.node)(data);
+});
 
-var origCwd = process.cwd;
-var cwd = null;
-var platform = process.env.GRACEFUL_FS_PLATFORM || process.platform;
-process.cwd = function () {
-  if (!cwd) cwd = origCwd.call(process);
-  return cwd;
+var _io = /*#__PURE__*/Object.freeze({
+  readRaw: readRaw,
+  readUTF8: readUTF8,
+  readFile: readFile,
+  writeRaw: writeRaw,
+  writeUTF8: writeUTF8,
+  writeFile: writeFile
+});
+
+var readRelative = ramda.pipe(relativePathWithCWD(process.cwd()), readFile);
+var readStdin = F__default.encaseP(getStdin);
+var readWithOpts = ramda.curry(function (opts, source) {
+  return (
+    opts.stdin ?
+    readStdin()
+    : F__default.of(source)
+  );
+});
+var ensureBinary = function ensureBinary(fn) {
+  if (process.env.NODE_ENV !== "production") {
+    if (typeof fn !== "function" || typeof fn("test") !== "function") {
+      throw new TypeError("Expected to be given a curried binary function!");
+    }
+  }
+  return fn;
 };
-try {
-  process.cwd();
-} catch (er) {}
-var chdir = process.chdir;
-process.chdir = function (d) {
-  cwd = null;
-  chdir.call(process, d);
-};
-var polyfills = patch;
-function patch(fs) {
-  if (constants.hasOwnProperty('O_SYMLINK') && process.version.match(/^v0\.6\.[0-2]|^v0\.5\./)) {
-    patchLchmod(fs);
-  }
-  if (!fs.lutimes) {
-    patchLutimes(fs);
-  }
-  fs.chown = chownFix(fs.chown);
-  fs.fchown = chownFix(fs.fchown);
-  fs.lchown = chownFix(fs.lchown);
-  fs.chmod = chmodFix(fs.chmod);
-  fs.fchmod = chmodFix(fs.fchmod);
-  fs.lchmod = chmodFix(fs.lchmod);
-  fs.chownSync = chownFixSync(fs.chownSync);
-  fs.fchownSync = chownFixSync(fs.fchownSync);
-  fs.lchownSync = chownFixSync(fs.lchownSync);
-  fs.chmodSync = chmodFixSync(fs.chmodSync);
-  fs.fchmodSync = chmodFixSync(fs.fchmodSync);
-  fs.lchmodSync = chmodFixSync(fs.lchmodSync);
-  fs.stat = statFix(fs.stat);
-  fs.fstat = statFix(fs.fstat);
-  fs.lstat = statFix(fs.lstat);
-  fs.statSync = statFixSync(fs.statSync);
-  fs.fstatSync = statFixSync(fs.fstatSync);
-  fs.lstatSync = statFixSync(fs.lstatSync);
-  if (!fs.lchmod) {
-    fs.lchmod = function (path, mode, cb) {
-      if (cb) process.nextTick(cb);
-    };
-    fs.lchmodSync = function () {};
-  }
-  if (!fs.lchown) {
-    fs.lchown = function (path, uid, gid, cb) {
-      if (cb) process.nextTick(cb);
-    };
-    fs.lchownSync = function () {};
-  }
-  if (platform === "win32") {
-    fs.rename = function (fs$rename) {
-      return function (from, to, cb) {
-        var start = Date.now();
-        var backoff = 0;
-        fs$rename(from, to, function CB(er) {
-          if (er && (er.code === "EACCES" || er.code === "EPERM") && Date.now() - start < 60000) {
-            setTimeout(function () {
-              fs.stat(to, function (stater, st) {
-                if (stater && stater.code === "ENOENT") fs$rename(from, to, CB);else cb(er);
-              });
-            }, backoff);
-            if (backoff < 100) backoff += 10;
-            return;
-          }
-          if (cb) cb(er);
-        });
-      };
-    }(fs.rename);
-  }
-  fs.read = function (fs$read) {
-    return function (fd, buffer, offset, length, position, callback_) {
-      var _callback;
-      if (callback_ && typeof callback_ === 'function') {
-        var eagCounter = 0;
-        _callback = function callback(er, _, __) {
-          if (er && er.code === 'EAGAIN' && eagCounter < 10) {
-            eagCounter++;
-            return fs$read.call(fs, fd, buffer, offset, length, position, _callback);
-          }
-          callback_.apply(this, arguments);
-        };
-      }
-      return fs$read.call(fs, fd, buffer, offset, length, position, _callback);
-    };
-  }(fs.read);
-  fs.readSync = function (fs$readSync) {
-    return function (fd, buffer, offset, length, position) {
-      var eagCounter = 0;
-      while (true) {
-        try {
-          return fs$readSync.call(fs, fd, buffer, offset, length, position);
-        } catch (er) {
-          if (er.code === 'EAGAIN' && eagCounter < 10) {
-            eagCounter++;
-            continue;
-          }
-          throw er;
-        }
-      }
-    };
-  }(fs.readSync);
-  function patchLchmod(fs) {
-    fs.lchmod = function (path, mode, callback) {
-      fs.open(path, constants.O_WRONLY | constants.O_SYMLINK, mode, function (err, fd) {
-        if (err) {
-          if (callback) callback(err);
-          return;
-        }
-        fs.fchmod(fd, mode, function (err) {
-          fs.close(fd, function (err2) {
-            if (callback) callback(err || err2);
-          });
-        });
-      });
-    };
-    fs.lchmodSync = function (path, mode) {
-      var fd = fs.openSync(path, constants.O_WRONLY | constants.O_SYMLINK, mode);
-      var threw = true;
-      var ret;
-      try {
-        ret = fs.fchmodSync(fd, mode);
-        threw = false;
-      } finally {
-        if (threw) {
-          try {
-            fs.closeSync(fd);
-          } catch (er) {}
-        } else {
-          fs.closeSync(fd);
-        }
-      }
-      return ret;
-    };
-  }
-  function patchLutimes(fs) {
-    if (constants.hasOwnProperty("O_SYMLINK")) {
-      fs.lutimes = function (path, at, mt, cb) {
-        fs.open(path, constants.O_SYMLINK, function (er, fd) {
-          if (er) {
-            if (cb) cb(er);
-            return;
-          }
-          fs.futimes(fd, at, mt, function (er) {
-            fs.close(fd, function (er2) {
-              if (cb) cb(er || er2);
-            });
-          });
-        });
-      };
-      fs.lutimesSync = function (path, at, mt) {
-        var fd = fs.openSync(path, constants.O_SYMLINK);
-        var ret;
-        var threw = true;
-        try {
-          ret = fs.futimesSync(fd, at, mt);
-          threw = false;
-        } finally {
-          if (threw) {
-            try {
-              fs.closeSync(fd);
-            } catch (er) {}
-          } else {
-            fs.closeSync(fd);
-          }
-        }
-        return ret;
-      };
-    } else {
-      fs.lutimes = function (_a, _b, _c, cb) {
-        if (cb) process.nextTick(cb);
-      };
-      fs.lutimesSync = function () {};
-    }
-  }
-  function chmodFix(orig) {
-    if (!orig) return orig;
-    return function (target, mode, cb) {
-      return orig.call(fs, target, mode, function (er) {
-        if (chownErOk(er)) er = null;
-        if (cb) cb.apply(this, arguments);
-      });
-    };
-  }
-  function chmodFixSync(orig) {
-    if (!orig) return orig;
-    return function (target, mode) {
-      try {
-        return orig.call(fs, target, mode);
-      } catch (er) {
-        if (!chownErOk(er)) throw er;
-      }
-    };
-  }
-  function chownFix(orig) {
-    if (!orig) return orig;
-    return function (target, uid, gid, cb) {
-      return orig.call(fs, target, uid, gid, function (er) {
-        if (chownErOk(er)) er = null;
-        if (cb) cb.apply(this, arguments);
-      });
-    };
-  }
-  function chownFixSync(orig) {
-    if (!orig) return orig;
-    return function (target, uid, gid) {
-      try {
-        return orig.call(fs, target, uid, gid);
-      } catch (er) {
-        if (!chownErOk(er)) throw er;
-      }
-    };
-  }
-  function statFix(orig) {
-    if (!orig) return orig;
-    return function (target, cb) {
-      return orig.call(fs, target, function (er, stats) {
-        if (!stats) return cb.apply(this, arguments);
-        if (stats.uid < 0) stats.uid += 0x100000000;
-        if (stats.gid < 0) stats.gid += 0x100000000;
-        if (cb) cb.apply(this, arguments);
-      });
-    };
-  }
-  function statFixSync(orig) {
-    if (!orig) return orig;
-    return function (target) {
-      var stats = orig.call(fs, target);
-      if (stats.uid < 0) stats.uid += 0x100000000;
-      if (stats.gid < 0) stats.gid += 0x100000000;
-      return stats;
-    };
-  }
-  function chownErOk(er) {
-    if (!er) return true;
-    if (er.code === "ENOSYS") return true;
-    var nonroot = !process.getuid || process.getuid() !== 0;
-    if (nonroot) {
-      if (er.code === "EINVAL" || er.code === "EPERM") return true;
-    }
-    return false;
-  }
-}
+var processAsync = ramda.curry(function (fn, opts, source) {
+  return ramda.pipe(
+  opts.file ? readRelative : readWithOpts(opts),
+  ensureBinary(fn)(opts),
+  opts.output ? ramda.chain(writeFile(opts.output)) : ramda.identity)(source);
+});
 
-var Stream = stream.Stream;
-var legacyStreams = legacy;
-function legacy(fs) {
-  return {
-    ReadStream: ReadStream,
-    WriteStream: WriteStream
-  };
-  function ReadStream(path, options) {
-    if (!(this instanceof ReadStream)) return new ReadStream(path, options);
-    Stream.call(this);
-    var self = this;
-    this.path = path;
-    this.fd = null;
-    this.readable = true;
-    this.paused = false;
-    this.flags = 'r';
-    this.mode = 438;
-    this.bufferSize = 64 * 1024;
-    options = options || {};
-    var keys = Object.keys(options);
-    for (var index = 0, length = keys.length; index < length; index++) {
-      var key = keys[index];
-      this[key] = options[key];
-    }
-    if (this.encoding) this.setEncoding(this.encoding);
-    if (this.start !== undefined) {
-      if ('number' !== typeof this.start) {
-        throw TypeError('start must be a Number');
-      }
-      if (this.end === undefined) {
-        this.end = Infinity;
-      } else if ('number' !== typeof this.end) {
-        throw TypeError('end must be a Number');
-      }
-      if (this.start > this.end) {
-        throw new Error('start must be <= end');
-      }
-      this.pos = this.start;
-    }
-    if (this.fd !== null) {
-      process.nextTick(function () {
-        self._read();
-      });
-      return;
-    }
-    fs.open(this.path, this.flags, this.mode, function (err, fd) {
-      if (err) {
-        self.emit('error', err);
-        self.readable = false;
-        return;
-      }
-      self.fd = fd;
-      self.emit('open', fd);
-      self._read();
-    });
-  }
-  function WriteStream(path, options) {
-    if (!(this instanceof WriteStream)) return new WriteStream(path, options);
-    Stream.call(this);
-    this.path = path;
-    this.fd = null;
-    this.writable = true;
-    this.flags = 'w';
-    this.encoding = 'binary';
-    this.mode = 438;
-    this.bytesWritten = 0;
-    options = options || {};
-    var keys = Object.keys(options);
-    for (var index = 0, length = keys.length; index < length; index++) {
-      var key = keys[index];
-      this[key] = options[key];
-    }
-    if (this.start !== undefined) {
-      if ('number' !== typeof this.start) {
-        throw TypeError('start must be a Number');
-      }
-      if (this.start < 0) {
-        throw new Error('start must be >= zero');
-      }
-      this.pos = this.start;
-    }
-    this.busy = false;
-    this._queue = [];
-    if (this.fd === null) {
-      this._open = fs.open;
-      this._queue.push([this._open, this.path, this.flags, this.mode, undefined]);
-      this.flush();
-    }
-  }
-}
-
-function _typeof(obj) {
-  if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-    _typeof = function (obj) {
-      return typeof obj;
-    };
-  } else {
-    _typeof = function (obj) {
-      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-    };
-  }
-
-  return _typeof(obj);
-}
+var _cli = /*#__PURE__*/Object.freeze({
+  readRelative: readRelative,
+  readStdin: readStdin,
+  readWithOpts: readWithOpts,
+  processAsync: processAsync
+});
 
 function _slicedToArray(arr, i) {
   return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest();
@@ -443,262 +132,6 @@ function _nonIterableSpread() {
 function _nonIterableRest() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance");
 }
-
-var clone_1 = clone;
-function clone(obj) {
-  if (obj === null || _typeof(obj) !== 'object') return obj;
-  if (obj instanceof Object) var copy = {
-    __proto__: obj.__proto__
-  };else var copy = Object.create(null);
-  Object.getOwnPropertyNames(obj).forEach(function (key) {
-    Object.defineProperty(copy, key, Object.getOwnPropertyDescriptor(obj, key));
-  });
-  return copy;
-}
-
-var gracefulFs = createCommonjsModule(function (module) {
-  var queue = [];
-  function noop() {}
-  var debug = noop;
-  if (util.debuglog) debug = util.debuglog('gfs4');else if (/\bgfs4\b/i.test(process.env.NODE_DEBUG || '')) debug = function debug() {
-    var m = util.format.apply(util, arguments);
-    m = 'GFS4: ' + m.split(/\n/).join('\nGFS4: ');
-    console.error(m);
-  };
-  if (/\bgfs4\b/i.test(process.env.NODE_DEBUG || '')) {
-    process.on('exit', function () {
-      debug(queue);
-      assert.equal(queue.length, 0);
-    });
-  }
-  module.exports = patch(clone_1(fs));
-  if (process.env.TEST_GRACEFUL_FS_GLOBAL_PATCH && !fs.__patched) {
-    module.exports = patch(fs);
-    fs.__patched = true;
-  }
-  module.exports.close = function (fs$close) {
-    return function (fd, cb) {
-      return fs$close.call(fs, fd, function (err) {
-        if (!err) retry();
-        if (typeof cb === 'function') cb.apply(this, arguments);
-      });
-    };
-  }(fs.close);
-  module.exports.closeSync = function (fs$closeSync) {
-    return function (fd) {
-      var rval = fs$closeSync.apply(fs, arguments);
-      retry();
-      return rval;
-    };
-  }(fs.closeSync);
-  if (!/\bgraceful-fs\b/.test(fs.closeSync.toString())) {
-    fs.closeSync = module.exports.closeSync;
-    fs.close = module.exports.close;
-  }
-  function patch(fs) {
-    polyfills(fs);
-    fs.gracefulify = patch;
-    fs.FileReadStream = ReadStream;
-    fs.FileWriteStream = WriteStream;
-    fs.createReadStream = createReadStream;
-    fs.createWriteStream = createWriteStream;
-    var fs$readFile = fs.readFile;
-    fs.readFile = readFile;
-    function readFile(path, options, cb) {
-      if (typeof options === 'function') cb = options, options = null;
-      return go$readFile(path, options, cb);
-      function go$readFile(path, options, cb) {
-        return fs$readFile(path, options, function (err) {
-          if (err && (err.code === 'EMFILE' || err.code === 'ENFILE')) enqueue([go$readFile, [path, options, cb]]);else {
-            if (typeof cb === 'function') cb.apply(this, arguments);
-            retry();
-          }
-        });
-      }
-    }
-    var fs$writeFile = fs.writeFile;
-    fs.writeFile = writeFile;
-    function writeFile(path, data, options, cb) {
-      if (typeof options === 'function') cb = options, options = null;
-      return go$writeFile(path, data, options, cb);
-      function go$writeFile(path, data, options, cb) {
-        return fs$writeFile(path, data, options, function (err) {
-          if (err && (err.code === 'EMFILE' || err.code === 'ENFILE')) enqueue([go$writeFile, [path, data, options, cb]]);else {
-            if (typeof cb === 'function') cb.apply(this, arguments);
-            retry();
-          }
-        });
-      }
-    }
-    var fs$appendFile = fs.appendFile;
-    if (fs$appendFile) fs.appendFile = appendFile;
-    function appendFile(path, data, options, cb) {
-      if (typeof options === 'function') cb = options, options = null;
-      return go$appendFile(path, data, options, cb);
-      function go$appendFile(path, data, options, cb) {
-        return fs$appendFile(path, data, options, function (err) {
-          if (err && (err.code === 'EMFILE' || err.code === 'ENFILE')) enqueue([go$appendFile, [path, data, options, cb]]);else {
-            if (typeof cb === 'function') cb.apply(this, arguments);
-            retry();
-          }
-        });
-      }
-    }
-    var fs$readdir = fs.readdir;
-    fs.readdir = readdir;
-    function readdir(path, options, cb) {
-      var args = [path];
-      if (typeof options !== 'function') {
-        args.push(options);
-      } else {
-        cb = options;
-      }
-      args.push(go$readdir$cb);
-      return go$readdir(args);
-      function go$readdir$cb(err, files) {
-        if (files && files.sort) files.sort();
-        if (err && (err.code === 'EMFILE' || err.code === 'ENFILE')) enqueue([go$readdir, [args]]);else {
-          if (typeof cb === 'function') cb.apply(this, arguments);
-          retry();
-        }
-      }
-    }
-    function go$readdir(args) {
-      return fs$readdir.apply(fs, args);
-    }
-    if (process.version.substr(0, 4) === 'v0.8') {
-      var legStreams = legacyStreams(fs);
-      ReadStream = legStreams.ReadStream;
-      WriteStream = legStreams.WriteStream;
-    }
-    var fs$ReadStream = fs.ReadStream;
-    if (fs$ReadStream) {
-      ReadStream.prototype = Object.create(fs$ReadStream.prototype);
-      ReadStream.prototype.open = ReadStream$open;
-    }
-    var fs$WriteStream = fs.WriteStream;
-    if (fs$WriteStream) {
-      WriteStream.prototype = Object.create(fs$WriteStream.prototype);
-      WriteStream.prototype.open = WriteStream$open;
-    }
-    fs.ReadStream = ReadStream;
-    fs.WriteStream = WriteStream;
-    function ReadStream(path, options) {
-      if (this instanceof ReadStream) return fs$ReadStream.apply(this, arguments), this;else return ReadStream.apply(Object.create(ReadStream.prototype), arguments);
-    }
-    function ReadStream$open() {
-      var that = this;
-      open(that.path, that.flags, that.mode, function (err, fd) {
-        if (err) {
-          if (that.autoClose) that.destroy();
-          that.emit('error', err);
-        } else {
-          that.fd = fd;
-          that.emit('open', fd);
-          that.read();
-        }
-      });
-    }
-    function WriteStream(path, options) {
-      if (this instanceof WriteStream) return fs$WriteStream.apply(this, arguments), this;else return WriteStream.apply(Object.create(WriteStream.prototype), arguments);
-    }
-    function WriteStream$open() {
-      var that = this;
-      open(that.path, that.flags, that.mode, function (err, fd) {
-        if (err) {
-          that.destroy();
-          that.emit('error', err);
-        } else {
-          that.fd = fd;
-          that.emit('open', fd);
-        }
-      });
-    }
-    function createReadStream(path, options) {
-      return new ReadStream(path, options);
-    }
-    function createWriteStream(path, options) {
-      return new WriteStream(path, options);
-    }
-    var fs$open = fs.open;
-    fs.open = open;
-    function open(path, flags, mode, cb) {
-      if (typeof mode === 'function') cb = mode, mode = null;
-      return go$open(path, flags, mode, cb);
-      function go$open(path, flags, mode, cb) {
-        return fs$open(path, flags, mode, function (err, fd) {
-          if (err && (err.code === 'EMFILE' || err.code === 'ENFILE')) enqueue([go$open, [path, flags, mode, cb]]);else {
-            if (typeof cb === 'function') cb.apply(this, arguments);
-            retry();
-          }
-        });
-      }
-    }
-    return fs;
-  }
-  function enqueue(elem) {
-    debug('ENQUEUE', elem[0].name, elem[1]);
-    queue.push(elem);
-  }
-  function retry() {
-    var elem = queue.shift();
-    if (elem) {
-      debug('RETRY', elem[0].name, elem[1]);
-      elem[0].apply(null, elem[1]);
-    }
-  }
-});
-var gracefulFs_1 = gracefulFs.close;
-var gracefulFs_2 = gracefulFs.closeSync;
-
-var readRaw = ramda.curryN(3, gracefulFs.readFile);
-var readUTF8 = readRaw(ramda.__, "utf8");
-var readFile = ramda.pipe(readUTF8, F.node);
-var writeRaw = ramda.curryN(4, gracefulFs.writeFile);
-var writeUTF8 = writeRaw(ramda.__, ramda.__, "utf8");
-var writeFile = ramda.curry(function (to, data) {
-  return ramda.pipe(writeUTF8(to), F.node)(data);
-});
-
-var _io = /*#__PURE__*/Object.freeze({
-	readRaw: readRaw,
-	readUTF8: readUTF8,
-	readFile: readFile,
-	writeRaw: writeRaw,
-	writeUTF8: writeUTF8,
-	writeFile: writeFile
-});
-
-var readRelative = ramda.pipe(relativePathWithCWD(process.cwd()), readFile);
-var readStdin = F__default.encaseP(getStdin);
-var readWithOpts = ramda.curry(function (opts, source) {
-  return (
-    opts.stdin ?
-    readStdin()
-    : F__default.of(source)
-  );
-});
-var ensureBinary = function ensureBinary(fn) {
-  if (process.env.NODE_ENV !== "production") {
-    if (typeof fn !== "function" || typeof fn("test") !== "function") {
-      throw new TypeError("Expected to be given a curried binary function!");
-    }
-  }
-  return fn;
-};
-var processAsync = ramda.curry(function (fn, opts, source) {
-  return ramda.pipe(
-  opts.file ? readRelative : readWithOpts(opts),
-  ensureBinary(fn)(opts),
-  opts.output ? ramda.chain(writeFile(opts.output)) : ramda.identity)(source);
-});
-
-var _cli = /*#__PURE__*/Object.freeze({
-	readRelative: readRelative,
-	readStdin: readStdin,
-	readWithOpts: readWithOpts,
-	processAsync: processAsync
-});
 
 var _map = [color.red, color.yellow, color.bold, color.underline].map(function (z) {
   return function (withColor) {
@@ -813,15 +246,15 @@ var helpWithOptions = ramda.curry(function (conf, argv) {
 });
 
 var _help = /*#__PURE__*/Object.freeze({
-	matchesTypeFromConfig: matchesTypeFromConfig,
-	flag: flag,
-	flagify: flagify,
-	wrapChars: wrapChars,
-	getRawDescriptionsOrThrow: getRawDescriptionsOrThrow,
-	getDefaults: getDefaults,
-	convertFlag: convertFlag,
-	getFlagInformation: getFlagInformation,
-	helpWithOptions: helpWithOptions
+  matchesTypeFromConfig: matchesTypeFromConfig,
+  flag: flag,
+  flagify: flagify,
+  wrapChars: wrapChars,
+  getRawDescriptionsOrThrow: getRawDescriptionsOrThrow,
+  getDefaults: getDefaults,
+  convertFlag: convertFlag,
+  getFlagInformation: getFlagInformation,
+  helpWithOptions: helpWithOptions
 });
 
 var PLACEHOLDER = "🍛";
@@ -971,8 +404,8 @@ var makeInspector = ramda.pipe(function (k) {
 }, make(callBinaryWithScope));
 
 var _log = /*#__PURE__*/Object.freeze({
-	makeTracer: makeTracer,
-	makeInspector: makeInspector
+  makeTracer: makeTracer,
+  makeInspector: makeInspector
 });
 
 var is = ramda.curry(function (expected, actual) {
@@ -988,6 +421,11 @@ var testHook = ramda.curry(function (property, done, assertion, x) {
 });
 var testHookStdout = testHook("stdout");
 var testHookStderr = testHook("stderr");
+var testShell = ramda.curry(function (cmd, testName, assertion) {
+  test(testName, function (done) {
+    execa.shell(cmd)["catch"](done).then(testHookStdout(done, assertion));
+  });
+});
 var testCLI = ramda.curry(function (_ref, testName, assertion) {
   var _ref2 = _toArray(_ref),
       exe = _ref2[0],
@@ -1004,15 +442,20 @@ var resolveFrom = function resolveFrom(dir) {
     return path$1.resolve.apply(path$1, [dir].concat(x));
   };
 };
+var testCommand = ramda.curry(function (args, assertion) {
+  return testCLI(args, args.join(" "), assertion);
+});
 
 var _testing = /*#__PURE__*/Object.freeze({
-	is: is,
-	matches: matches,
-	testHook: testHook,
-	testHookStdout: testHookStdout,
-	testHookStderr: testHookStderr,
-	testCLI: testCLI,
-	resolveFrom: resolveFrom
+  is: is,
+  matches: matches,
+  testHook: testHook,
+  testHookStdout: testHookStdout,
+  testHookStderr: testHookStderr,
+  testShell: testShell,
+  testCLI: testCLI,
+  resolveFrom: resolveFrom,
+  testCommand: testCommand
 });
 
 var cli = _cli;

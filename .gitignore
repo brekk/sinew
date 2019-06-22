@@ -4,3 +4,9 @@ node_modules
 coverage
 lib
 docs
+cli.js
+help.js
+io.js
+log.js
+path.js
+testing.js

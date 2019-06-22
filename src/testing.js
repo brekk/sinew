@@ -43,6 +43,24 @@ export const testHookStdout = testHook("stdout")
 export const testHookStderr = testHook("stderr")
 
 /**
+ * A simplified way of testing asynchronous command-line calls using execa.shell
+ * Designed for jest testing
+ * @method testCLI
+ * @public
+ * @param {string[]} cli - commands and flags to pass to execa
+ * @param {string} testName - the name of your test
+ * @param {function} assertion - an assertion function. receives actual value as only param
+ */
+export const testShell = curry((cmd, testName, assertion) => {
+  test(testName, done => {
+    execa
+      .shell(cmd)
+      .catch(done)
+      .then(testHookStdout(done, assertion))
+  })
+})
+
+/**
  * A simplified way of testing asynchronous command-line calls
  * Designed for jest testing
  * @method testCLI
@@ -69,3 +87,7 @@ export const testCLI = curry(([exe, ...args], testName, assertion) => {
 // })
 
 export const resolveFrom = dir => (...x) => path.resolve(dir, ...x)
+
+export const testCommand = curry((args, assertion) =>
+  testCLI(args, args.join(" "), assertion)
+)

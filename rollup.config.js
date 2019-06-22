@@ -5,33 +5,33 @@ import cleanup from "rollup-plugin-cleanup"
 import json from "rollup-plugin-json"
 import progress from "rollup-plugin-progress"
 // import prepack from "rollup-plugin-prepack"
-import camelCase from "camel-case"
 import pkg from "./package.json"
 
-const plugins = [
+const plugins = (preferBuiltins = true) => [
   progress(),
   json(),
   cjs({ extensions: [`.js`], include: `node_modules/**` }),
   babel(),
-  resolve({ jsnext: true, main: true }),
+  resolve({ mainFields: ["module", "main"], preferBuiltins }),
   cleanup({ comments: `none` })
 ]
+
 const external =
   [
     ...Object.keys(pkg.dependencies),
-    ...Object.keys(pkg.peerDependencies || {})
+    ...Object.keys(pkg.peerDependencies || {}),
+    "path",
+    "fs"
   ] || []
 
+const individual = (file, preferBuiltins = true) => ({
+  input: `src/${file}`,
+  external,
+  output: [{ file, format: `cjs` }],
+  plugins: plugins(preferBuiltins)
+})
+
 export default [
-  // {
-  //   input: `src/index.js`,
-  //   output: {
-  //     name: camelCase(pkg.name),
-  //     file: pkg.browser,
-  //     format: `umd`
-  //   },
-  //   plugins
-  // },
   {
     input: `src/index.js`,
     external,
@@ -39,6 +39,12 @@ export default [
       { file: pkg.main, format: `cjs` },
       { file: pkg.module, format: `es` }
     ],
-    plugins
-  }
+    plugins: plugins()
+  },
+  individual(`cli.js`),
+  individual(`help.js`),
+  individual(`io.js`),
+  individual(`log.js`),
+  individual(`path.js`),
+  individual(`testing.js`)
 ]

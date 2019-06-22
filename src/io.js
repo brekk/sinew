@@ -1,4 +1,5 @@
-import fs from "graceful-fs"
+// import fs from "graceful-fs"
+import fs from "fs"
 import { node } from "fluture"
 import { curry, curryN, __ as $, pipe } from "ramda"
 
