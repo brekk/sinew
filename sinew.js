@@ -17,6 +17,7 @@ var execa = _interopDefault(require('execa'));
 var relativePathWithCWD = ramda.curryN(2, path.relative);
 
 var _path = /*#__PURE__*/Object.freeze({
+  __proto__: null,
   relativePathWithCWD: relativePathWithCWD
 });
 
@@ -30,6 +31,7 @@ var writeFile = ramda.curry(function (to, data) {
 });
 
 var _io = /*#__PURE__*/Object.freeze({
+  __proto__: null,
   readRaw: readRaw,
   readUTF8: readUTF8,
   readFile: readFile,
@@ -63,6 +65,7 @@ var processAsync = ramda.curry(function (fn, opts, source) {
 });
 
 var _cli = /*#__PURE__*/Object.freeze({
+  __proto__: null,
   readRelative: readRelative,
   readStdin: readStdin,
   readWithOpts: readWithOpts,
@@ -70,23 +73,19 @@ var _cli = /*#__PURE__*/Object.freeze({
 });
 
 function _slicedToArray(arr, i) {
-  return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest();
+  return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
 }
 
 function _toArray(arr) {
-  return _arrayWithHoles(arr) || _iterableToArray(arr) || _nonIterableRest();
+  return _arrayWithHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableRest();
 }
 
 function _toConsumableArray(arr) {
-  return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
+  return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
 }
 
 function _arrayWithoutHoles(arr) {
-  if (Array.isArray(arr)) {
-    for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
-
-    return arr2;
-  }
+  if (Array.isArray(arr)) return _arrayLikeToArray(arr);
 }
 
 function _arrayWithHoles(arr) {
@@ -94,10 +93,11 @@ function _arrayWithHoles(arr) {
 }
 
 function _iterableToArray(iter) {
-  if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
+  if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter);
 }
 
 function _iterableToArrayLimit(arr, i) {
+  if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;
   var _arr = [];
   var _n = true;
   var _d = false;
@@ -123,12 +123,29 @@ function _iterableToArrayLimit(arr, i) {
   return _arr;
 }
 
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(o);
+  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+}
+
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+
+  for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+
+  return arr2;
+}
+
 function _nonIterableSpread() {
-  throw new TypeError("Invalid attempt to spread non-iterable instance");
+  throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
 function _nonIterableRest() {
-  throw new TypeError("Invalid attempt to destructure non-iterable instance");
+  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
 var _map = [color.red, color.yellow, color.bold, color.underline].map(function (z) {
@@ -244,6 +261,7 @@ var helpWithOptions = ramda.curry(function (conf, argv) {
 });
 
 var _help = /*#__PURE__*/Object.freeze({
+  __proto__: null,
   matchesTypeFromConfig: matchesTypeFromConfig,
   flag: flag,
   flagify: flagify,
@@ -402,6 +420,7 @@ var makeInspector = ramda.pipe(function (k) {
 }, make(callBinaryWithScope));
 
 var _log = /*#__PURE__*/Object.freeze({
+  __proto__: null,
   makeTracer: makeTracer,
   makeInspector: makeInspector
 });
@@ -445,6 +464,7 @@ var testCommand = ramda.curry(function (args, assertion) {
 });
 
 var _testing = /*#__PURE__*/Object.freeze({
+  __proto__: null,
   is: is,
   matches: matches,
   testHook: testHook,

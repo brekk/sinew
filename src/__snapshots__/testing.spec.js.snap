@@ -1,34 +1,32 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`nps 1`] = `
-"Usage: node_modules/.bin/nps [options] <script>...
+"Usage: nps [options] <script>...
 
 Commands:
-  init        automatically migrate from npm scripts to nps
-  completion  generate bash completion script
+  nps init        automatically migrate from npm scripts to nps
+  nps completion  generate completion script
 
 Options:
   --config, -c      Config file to use (defaults to nearest package-scripts.yml
                     or package-scripts.js)
-                 [default: \\"/Users/brekkbockrath/work/sinew/package-scripts.js\\"]
+                         [default: \\"/Users/brekk/work/sinew/package-scripts.js\\"]
   --silent, -s      Silent nps output                 [boolean] [default: false]
   --log-level, -l   The log level to use
                    [choices: \\"error\\", \\"warn\\", \\"info\\", \\"debug\\"] [default: \\"info\\"]
+  --prefix, -p      Prefix for each script name
   --require, -r     Module to preload
   --scripts         Log command text for script        [boolean] [default: true]
   --help-style, -y  Choose the level of detail displayed by the help command
                            [choices: \\"all\\", \\"scripts\\", \\"basic\\"] [default: \\"all\\"]
-  -h, --help        Show help                                          [boolean]
   -v, --version     Show version number                                [boolean]
 
 Examples:
-  node_modules/.bin/nps test build          Runs the \`test\` script then the
-                                            \`build\` script
-  node_modules/.bin/nps \\"test --cover\\"      Runs the \`test\` script and forwards
-  \\"build --prod\\"                            the \\"--cover\\" flag then the \`build\`
-                                            script and forwards the \\"--prod\\"
-                                            flag
-
+  nps test build                     Runs the \`test\` script then the \`build\`
+                                     script
+  nps \\"test --cover\\" \\"build --prod\\"  Runs the \`test\` script and forwards the
+                                     \\"--cover\\" flag then the \`build\` script and
+                                     forwards the \\"--prod\\" flag
 Available scripts (camel or kebab case accepted)
 
 [32mdependencies[39m - [37mcheck dependencies[39m - [90mdepcheck --specials=bin,eslint,babel --ignores=@babel/cli,@babel/core,@babel/plugin-transform-destructuring,@babel/preset-env,babel-core,babel-eslint,babel-jest,depcheck,documentation,docusaurus,husky,jest,prettier-eslint,rollup,nps[39m
@@ -46,34 +44,32 @@ Available scripts (camel or kebab case accepted)
 `;
 
 exports[`testCLI 1`] = `
-"Usage: node_modules/.bin/nps [options] <script>...
+"Usage: nps [options] <script>...
 
 Commands:
-  init        automatically migrate from npm scripts to nps
-  completion  generate bash completion script
+  nps init        automatically migrate from npm scripts to nps
+  nps completion  generate completion script
 
 Options:
   --config, -c      Config file to use (defaults to nearest package-scripts.yml
                     or package-scripts.js)
-                 [default: \\"/Users/brekkbockrath/work/sinew/package-scripts.js\\"]
+                         [default: \\"/Users/brekk/work/sinew/package-scripts.js\\"]
   --silent, -s      Silent nps output                 [boolean] [default: false]
   --log-level, -l   The log level to use
                    [choices: \\"error\\", \\"warn\\", \\"info\\", \\"debug\\"] [default: \\"info\\"]
+  --prefix, -p      Prefix for each script name
   --require, -r     Module to preload
   --scripts         Log command text for script        [boolean] [default: true]
   --help-style, -y  Choose the level of detail displayed by the help command
                            [choices: \\"all\\", \\"scripts\\", \\"basic\\"] [default: \\"all\\"]
-  -h, --help        Show help                                          [boolean]
   -v, --version     Show version number                                [boolean]
 
 Examples:
-  node_modules/.bin/nps test build          Runs the \`test\` script then the
-                                            \`build\` script
-  node_modules/.bin/nps \\"test --cover\\"      Runs the \`test\` script and forwards
-  \\"build --prod\\"                            the \\"--cover\\" flag then the \`build\`
-                                            script and forwards the \\"--prod\\"
-                                            flag
-
+  nps test build                     Runs the \`test\` script then the \`build\`
+                                     script
+  nps \\"test --cover\\" \\"build --prod\\"  Runs the \`test\` script and forwards the
+                                     \\"--cover\\" flag then the \`build\` script and
+                                     forwards the \\"--prod\\" flag
 Available scripts (camel or kebab case accepted)
 
 [32mdependencies[39m - [37mcheck dependencies[39m - [90mdepcheck --specials=bin,eslint,babel --ignores=@babel/cli,@babel/core,@babel/plugin-transform-destructuring,@babel/preset-env,babel-core,babel-eslint,babel-jest,depcheck,documentation,docusaurus,husky,jest,prettier-eslint,rollup,nps[39m

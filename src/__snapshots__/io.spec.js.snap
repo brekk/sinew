@@ -23,6 +23,7 @@ Object {
     "babel-eslint": "^10.0.1",
     "babel-jest": "^24.8.0",
     "depcheck": "^0.6.11",
+    "documentation": "^13.1.1",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.3.0",
     "eslint-config-standard": "^12.0.0",
@@ -54,6 +55,6 @@ Object {
   "name": "sinew",
   "private": false,
   "repository": "https://github.com/brekk/sinew",
-  "version": "0.0.0",
+  "version": "1.0.1",
 }
 `;
