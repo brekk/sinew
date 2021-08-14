@@ -83,7 +83,7 @@ test("processAsync - yellOnNonBinary", done => {
     return x
   }
   const futureValue = processAsync(fn2, opts, source)
-  return futureValue.fork(done, () => done())
+  futureValue.fork(done, () => done())
 })
 test("processAsync - yellOnNonBinary - curried", done => {
   const source = { a: 1, b: 2, c: 3 }
@@ -93,5 +93,5 @@ test("processAsync - yellOnNonBinary - curried", done => {
     return x
   })
   const futureValue = processAsync(fn2, opts, source)
-  return futureValue.fork(done, () => done())
+  futureValue.fork(done, () => done())
 })

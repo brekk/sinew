@@ -6,7 +6,7 @@ const here = (...x) => path.join(__dirname, ...x)
 const jsonPkg = here("..", "package.json")
 
 test("readFile", done => {
-  return readFile(jsonPkg).fork(done, raw => {
+  readFile(jsonPkg).fork(done, raw => {
     expect(JSON.parse(raw)).toMatchSnapshot()
     done()
   })

@@ -55,6 +55,6 @@ Object {
   "name": "sinew",
   "private": false,
   "repository": "https://github.com/brekk/sinew",
-  "version": "1.0.1",
+  "version": "1.0.2",
 }
 `;

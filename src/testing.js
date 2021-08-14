@@ -70,11 +70,11 @@ export const testShell = curry((cmd, testName, assertion) => {
  * @param {function} assertion - an assertion function. receives actual value as only param
  */
 export const testCLI = curry(([exe, ...args], testName, assertion) => {
-  test(testName, done =>
+  test(testName, done => {
     execa(exe, args)
       .catch(done)
       .then(testHookStdout(done, assertion))
-  )
+  })
 })
 
 // not sure how to test this yet, so commented out for now
