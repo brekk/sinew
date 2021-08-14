@@ -6,7 +6,7 @@ import {
   testCLI,
   testCommand,
   testShell,
-  resolveFrom
+  resolveFrom,
 } from "./testing"
 
 const sliceFromSecondToLastSlash = x =>
